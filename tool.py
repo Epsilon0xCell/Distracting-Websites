@@ -3,11 +3,47 @@ from bs4 import BeautifulSoup
 from google import genai
 from urllib.parse import urlparse
 from typing import List, Optional
+import os
 import re
 
-# Initialize Gemini API using official docs
-API_KEY = ""
-client = genai.Client(api_key=API_KEY)
+# The Gemini client is created lazily so that importing this module (and
+# running the parts that do not need the API) never crashes. Set the
+# GEMINI_API_KEY environment variable (GOOGLE_API_KEY is also accepted).
+_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "No Gemini API key found. Set the GEMINI_API_KEY environment "
+                "variable to a key from Google AI Studio and run again."
+            )
+        _client = genai.Client(api_key=api_key)
+    return _client
+
+def normalize_domain(website: str) -> str:
+    # urlparse only fills netloc when a scheme is present, and callers type
+    # addresses in forms like "khanacademy.org" or "www.khanacademy.org".
+    candidate = website if "://" in website else "https://" + website
+    domain = urlparse(candidate).netloc.lower().split(":")[0]
+    if domain.startswith("www."):
+        domain = domain[4:]
+    return domain
+
+def ensure_scheme(website: str) -> str:
+    return website if "://" in website else "https://" + website
+
+def parse_score(text: str) -> Optional[int]:
+    # Models often answer "Score: 85" instead of a bare number. Take the
+    # first number in the reply instead of requiring the whole reply to be
+    # digits (int(text) raised ValueError, and joining every digit in the
+    # reply concatenated unrelated numbers into a wrong score).
+    match = re.search(r"\d+(?:\.\d+)?", text or "")
+    if not match:
+        return None
+    return int(float(match.group()))
 
 class Question:
     def __init__(self, text: str):
@@ -56,22 +92,29 @@ def get_specific_questions(task_details: str) -> List[Question]:
     QUESTIONS: (one question per line)
     """
     try:
-        response = client.models.generate_content(
+        response = get_client().models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt
         )
         response_text = response.text.strip()
-        
-        # Parse sections
+
+        # Parse sections. The prompt above asks for MISSING_CATEGORIES: and
+        # QUESTIONS: headers; the parser previously looked for MISSING:,
+        # which the prompt never produces, so the nothing-missing check
+        # below could never fire.
         sections = {}
         current_section = None
         for line in response_text.split('\n'):
-            if line.startswith(('HAVE:', 'MISSING:', 'QUESTIONS:')):
-                current_section = line.split(':')[0]
+            if line.startswith(('HAVE:', 'MISSING_CATEGORIES:', 'MISSING:', 'QUESTIONS:')):
+                header = line.split(':')[0]
+                current_section = 'MISSING' if header.startswith('MISSING') else header
                 sections[current_section] = []
+                remainder = line.split(':', 1)[1].strip()
+                if remainder:
+                    sections[current_section].append(remainder)
             elif current_section and line.strip():
                 sections[current_section].append(line.strip())
-        
+
         # If we have everything we need (no MISSING items), return no questions
         if 'MISSING' in sections and not sections['MISSING']:
             return []
@@ -111,15 +154,14 @@ def is_task_specific_enough(task_details):
     Respond with only the number.
     """
     try:
-        response = client.models.generate_content(
+        response = get_client().models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt
         )
-        cleaned_response = ''.join(filter(str.isdigit, response.text.strip()))
-        if not cleaned_response:
+        confidence = parse_score(response.text)
+        if confidence is None:
             return False
-            
-        confidence = int(cleaned_response)
+
         # Require at least 20 points in each category (80 total)
         return confidence >= 80
     except Exception as e:
@@ -177,8 +219,7 @@ def get_website_info(website):
     }
 
     # Check if it's a known platform first
-    parsed_url = urlparse(website)
-    domain = parsed_url.netloc.lower()
+    domain = normalize_domain(website)
     
     if domain in known_edu_platforms:
         platform = known_edu_platforms[domain]
@@ -197,25 +238,27 @@ def get_website_info(website):
 
     # Regular website analysis for unknown sites
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        response = requests.get(website, headers=headers, timeout=10)
+        http_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(ensure_scheme(website), headers=http_headers, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
-        
+
         # Get all text content
         for script in soup(["script", "style"]):
             script.decompose()
-            
+
         # Enhanced extraction of key information
         title = soup.title.string if soup.title else ""
         meta_desc = soup.find('meta', attrs={'name': 'description'})
-        description = meta_desc['content'] if meta_desc else ""
-        
+        # A description meta tag without a content attribute used to raise
+        # KeyError here and discard the whole page extraction.
+        description = meta_desc.get('content', '') if meta_desc else ""
+
         # Get main content safely
-        headers = []
+        headings = []
         try:
-            headers = [h.text.strip() for h in soup.find_all(['h1', 'h2', 'h3']) if h.text.strip()][:5]
+            headings = [h.text.strip() for h in soup.find_all(['h1', 'h2', 'h3']) if h.text.strip()][:5]
         except:
-            headers = []
+            headings = []
             
         paragraphs = []
         try:
@@ -279,14 +322,16 @@ def get_website_info(website):
                 distraction_count += page_text.count(keyword)
                 total_elements += 1
         
-        # Calculate distraction ratio
-        distraction_ratio = distraction_count / max(total_elements, 1)
+        # Calculate distraction ratio. total_elements counts keyword types,
+        # not occurrences, so the raw value can exceed 1 (a page repeating
+        # "video" 100 times scored 4.00). Cap it so the level stays a ratio.
+        distraction_ratio = min(distraction_count / max(total_elements, 1), 1.0)
         
         # Safer content summary construction
         content_parts = [
             f"Title: {title[:500] if title else 'No title'}",
             f"Description: {description[:500] if description else 'No description'}",
-            "Headers: " + " | ".join(headers) if headers else "No headers found",
+            "Headers: " + " | ".join(headings) if headings else "No headers found",
             "Content: " + " ".join(paragraphs) if paragraphs else "No content found",
             "Domain Analysis: " + ", ".join([
                 f"{domain}: {'Yes' if matches['domain_match'] or matches['keyword_match'] else 'No'}"
@@ -316,9 +361,8 @@ def determine_relevance(task_details, website):
         'ixl.com': 80
     }
     
-    parsed_url = urlparse(website)
-    domain = parsed_url.netloc.lower()
-    
+    domain = normalize_domain(website)
+
     # Special handling for known educational platforms
     if domain in known_edu_platforms:
         base_score = known_edu_platforms[domain]
@@ -344,8 +388,10 @@ def determine_relevance(task_details, website):
     }
     
     threshold_modifier = 1.0
-    for domain, required_confidence in high_distraction_domains.items():
-        if domain in website.lower():
+    for high_domain, required_confidence in high_distraction_domains.items():
+        # Match the domain itself or a subdomain of it, not any URL that
+        # merely contains the text (for example notyoutube.com).
+        if domain == high_domain or domain.endswith('.' + high_domain):
             threshold_modifier = required_confidence
             break
 
@@ -383,11 +429,13 @@ def determine_relevance(task_details, website):
     """
     
     try:
-        response = client.models.generate_content(
+        response = get_client().models.generate_content(
             model="gemini-2.0-flash",
             contents=prompt
         )
-        base_confidence = int(response.text.strip())
+        base_confidence = parse_score(response.text)
+        if base_confidence is None:
+            return False
         
         # Apply threshold modifier for high-distraction sites
         final_confidence = base_confidence * threshold_modifier
@@ -401,10 +449,24 @@ def main():
     print("\n" + "=" * 80)
     print("Website Productivity Analyzer".center(80))
     print("=" * 80 + "\n")
-    
-    task = get_user_task()
+
+    try:
+        # Fail fast with a clear message when no API key is configured,
+        # instead of crashing on the first model call.
+        get_client()
+        task = get_user_task()
+    except RuntimeError as e:
+        print(str(e))
+        return
+    except (EOFError, KeyboardInterrupt):
+        print("\nExiting.")
+        return
     while True:
-        website = input("\nEnter the website URL to analyze (or 'exit' to quit): ")
+        try:
+            website = input("\nEnter the website URL to analyze (or 'exit' to quit): ")
+        except (EOFError, KeyboardInterrupt):
+            print("\nExiting.")
+            break
         if website.lower() in ['exit', 'quit']:
             break
         print("\n" + "-" * 80)
