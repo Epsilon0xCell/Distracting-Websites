@@ -1,3 +1,8 @@
+# I wrote this file. It judges websites against a task the user describes
+# and prints a verdict. It does not block, redirect, or change anything on
+# the machine, whatever the output says. Every score below comes from the
+# Gemini model or from the fixed tables in this file, so a verdict is only
+# as good as the page text I manage to fetch and the prompt I send with it.
 import requests
 from bs4 import BeautifulSoup
 from google import genai
@@ -51,11 +56,18 @@ class Question:
     
     @staticmethod
     def clean_question(text: str) -> str:
-        # Remove markdown, numbering, and extra spaces
+        # The model answers in markdown list form, so I strip the bold
+        # markers and the "1. " style numbering here instead of trusting
+        # every call site to clean up. The trade-off: the numbering pattern
+        # also matches inside a question, so a question that mentions
+        # something like "chapter 3. vectors" loses the "3. " in display.
         text = re.sub(r'\*\*|\d+\.\s+', '', text)
         return text.strip()
     
     def ask(self) -> str:
+        # I let EOFError from input() propagate out of here on purpose.
+        # main() is the one place that turns a closed stdin into a clean
+        # exit, and catching it in every prompt method would duplicate that.
         print("\n" + "-" * 80)
         print(f"Question: {self.text}")
         print("-" * 80)
@@ -102,6 +114,13 @@ def get_specific_questions(task_details: str) -> List[Question]:
         # QUESTIONS: headers; the parser previously looked for MISSING:,
         # which the prompt never produces, so the nothing-missing check
         # below could never fire.
+        # This parse only works if the model puts the headers at the start
+        # of a line, the way the prompt shows them. If the model wraps the
+        # reply in a code fence or indents the headers, no section is ever
+        # opened and I return no questions, which the caller then replaces
+        # with its fallback set. I accept that instead of guessing at
+        # near-miss headers, because a misparsed reply once produced
+        # questions the model never asked.
         sections = {}
         current_section = None
         for line in response_text.split('\n'):
@@ -162,7 +181,12 @@ def is_task_specific_enough(task_details):
         if confidence is None:
             return False
 
-        # Require at least 20 points in each category (80 total)
+        # The prompt asks for 20 or more in each of the four categories,
+        # but the model returns one total number, so I cannot check the
+        # per-category part from here. The 80 threshold is the only part
+        # I actually enforce. A task strong in three categories and empty
+        # in the fourth can pass if the total reaches 80, and I would
+        # rather say that plainly than pretend the check is stricter.
         return confidence >= 80
     except Exception as e:
         print(f"Error checking task specificity: {str(e)}")
@@ -173,11 +197,15 @@ def ask_additional_questions(task_details: str) -> str:
     iteration = 0
     max_iterations = 10  # Increased max iterations
     
+    # The iteration cap is a cost bound, not a quality target. Each pass is
+    # two model calls, and a user who answers vaguely forever would
+    # otherwise loop until they kill the program. After 10 rounds I hand
+    # back whatever detail has gathered and let the site checks run on it.
     while not required_info_gathered and iteration < max_iterations:
         if is_task_specific_enough(task_details):
             required_info_gathered = True
             break
-            
+
         questions = get_specific_questions(task_details)
         if not questions:
             # If no questions but not specific enough, generate fallback questions
@@ -192,6 +220,10 @@ def ask_additional_questions(task_details: str) -> str:
         for question in questions:
             answer = question.ask()
             if not answer:  # If user doesn't provide answer, stop asking
+                # An empty answer ends the whole gathering phase, and the
+                # answers collected in this round are dropped with it.
+                # I treat a blank as "stop asking me", not as "skip this
+                # one question", because that is how people use it.
                 return task_details
             answers.append(f"{question.text}: {answer}")
         
@@ -201,7 +233,12 @@ def ask_additional_questions(task_details: str) -> str:
     return task_details
 
 def get_website_info(website):
-    # Known educational platforms that might block scraping
+    # These two platforms sit behind sign-in walls, so a fetch returns a
+    # login page that says nothing about the real content. I answer from
+    # this fixed profile instead of scoring the login page. This table is
+    # separate from the scoring table in determine_relevance, and the two
+    # have already drifted apart once, so a platform added to one place
+    # still needs its entry in the other.
     known_edu_platforms = {
         'classroom.google.com': {
             'title': 'Google Classroom',
@@ -218,9 +255,11 @@ def get_website_info(website):
         # Add more known platforms as needed
     }
 
-    # Check if it's a known platform first
+    # Check if it's a known platform first. This is an exact domain match
+    # after normalization, so a subdomain like courses.khanacademy.org
+    # does not hit the fast path and gets fetched like any unknown site.
     domain = normalize_domain(website)
-    
+
     if domain in known_edu_platforms:
         platform = known_edu_platforms[domain]
         return "\n".join([
@@ -239,6 +278,11 @@ def get_website_info(website):
     # Regular website analysis for unknown sites
     try:
         http_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        # I never check the status code here. A 404 or a block page is
+        # parsed and scored like real content, which can produce a
+        # confident verdict about a page the user never sees. The 10
+        # second timeout is the only guard, and a slow site falls into
+        # the exception path below and is reported as a fetch failure.
         response = requests.get(ensure_scheme(website), headers=http_headers, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -291,7 +335,11 @@ def get_website_info(website):
             }
         }
 
-        # Safe domain checking
+        # Safe domain checking. Unlike the platform checks above, this one
+        # is a plain substring test on the raw text the user typed, so a
+        # lookalike address that contains a listed name counts as a match.
+        # It only feeds the summary text sent to the model, never a
+        # verdict on its own, which is why I left the weaker check here.
         domain_matches = {}
         try:
             for domain_type, indicators in domain_indicators.items():
@@ -319,6 +367,11 @@ def get_website_info(website):
         
         for category, keywords in distraction_indicators.items():
             for keyword in keywords:
+                # page_text is the whole HTML source, markup included, so
+                # a keyword inside a tag attribute or a class name counts
+                # the same as one in visible text. The level is a rough
+                # signal for the model, not a measurement of the page a
+                # reader sees.
                 distraction_count += page_text.count(keyword)
                 total_elements += 1
         
@@ -369,11 +422,19 @@ def determine_relevance(task_details, website):
         # Only adjust score down if task is clearly unrelated to platform's purpose
         if "math" in task_details.lower() and domain in ['classroom.google.com', 'khanacademy.org']:
             return True
-        # For other cases, use the base score
+        # Every score in the table above is 80 or higher, so this line
+        # always returns True as the table stands. The comparison only
+        # starts to mean something if someone adds a platform below 75,
+        # which is the honest way to read it: this is a whitelist with a
+        # dormant threshold, not a graded score.
         return base_score >= 75
 
     # Regular website analysis
     website_info = get_website_info(website)
+    # The "URL:" prefix is the failure string get_website_info returns
+    # when a fetch fails, so this check depends on that exact wording.
+    # If the fallback text ever changes, failed fetches would be sent to
+    # the model as if they were page summaries.
     if not website_info or website_info.startswith("URL:"):
         return False
 
@@ -442,6 +503,9 @@ def determine_relevance(task_details, website):
         
         return final_confidence >= 75  # Increased base threshold
     except Exception as e:
+        # Any model or network failure lands here and reads as "not
+        # productive". I fail closed on purpose: a site I could not judge
+        # should not get a yes from a crash.
         print(f"Error determining relevance: {e}")
         return False
 
@@ -452,7 +516,10 @@ def main():
 
     try:
         # Fail fast with a clear message when no API key is configured,
-        # instead of crashing on the first model call.
+        # instead of crashing on the first model call. This call also has
+        # to come first for a second reason: it builds the shared client
+        # every later function reaches through get_client(), so the key
+        # check and the setup stay in one place.
         get_client()
         task = get_user_task()
     except RuntimeError as e:
