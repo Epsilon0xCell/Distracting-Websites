@@ -51,7 +51,12 @@ python3 tool.py
 `GOOGLE_API_KEY` is also accepted. With no key set, the tool prints a
 short message naming the missing variable and exits instead of
 crashing. Type `exit` or `quit` at the website prompt to stop; closing
-input (Ctrl-D) also exits cleanly.
+input (Ctrl-D) also exits cleanly. A blank task is asked for again,
+and a blank line at the website prompt just asks again instead of
+scoring an empty address. `python3 tool.py --help` prints a short
+usage text and exits 0, and it works before the packages above are
+installed, because the imports for them happen inside the functions
+that use them. Any other argument exits 2.
 
 ## What it does not do
 
@@ -62,4 +67,24 @@ input (Ctrl-D) also exits cleanly.
   Gemini API for scoring, so do not point it at pages or tasks you
   need to keep private.
 - Sites that refuse scraping return limited information, and the tool
-  then reports the site as not productive rather than guessing.
+  then reports the site as not productive rather than guessing. An
+  HTTP error status (a 404, a block page) counts as a failed fetch
+  the same way: the error page itself is not scored as content.
+- A model reply with a score outside 0 to 100 is treated as no score
+  at all, and the check it fed fails closed.
+
+## Tests
+
+```sh
+python3 -m unittest discover -s tests
+```
+
+22 tests, all passing when I last ran them. They mock the Gemini
+client and every fetch, so no network or API call happens: domain
+normalizing, score parsing including the out of range case, question
+cleaning, the specificity threshold, the known platform fast path,
+the high distraction scaling, the failed fetch verdict, the blank
+line handling in the main loop, and the entry points (`--help` at
+exit 0 without the API packages installed, an unknown argument at
+exit 2, and the no key message). The live path against the real
+Gemini API is not covered by these tests.

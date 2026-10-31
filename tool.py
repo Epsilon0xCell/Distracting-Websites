@@ -3,13 +3,17 @@
 # the machine, whatever the output says. Every score below comes from the
 # Gemini model or from the fixed tables in this file, so a verdict is only
 # as good as the page text I manage to fetch and the prompt I send with it.
-import requests
-from bs4 import BeautifulSoup
-from google import genai
 from urllib.parse import urlparse
 from typing import List, Optional
 import os
 import re
+import sys
+
+# requests, beautifulsoup4, and google-genai are imported inside the
+# functions that use them, not at the top. That keeps --help, the
+# import of this module, and the pure helpers below (normalize_domain,
+# parse_score, Question) working on a machine where the packages are
+# not installed yet, instead of dying on the first import line.
 
 # The Gemini client is created lazily so that importing this module (and
 # running the parts that do not need the API) never crashes. Set the
@@ -24,6 +28,13 @@ def get_client():
             raise RuntimeError(
                 "No Gemini API key found. Set the GEMINI_API_KEY environment "
                 "variable to a key from Google AI Studio and run again."
+            )
+        try:
+            from google import genai
+        except ImportError:
+            raise RuntimeError(
+                "The google-genai package is not installed. Run "
+                "pip install -r requirements.txt and try again."
             )
         _client = genai.Client(api_key=api_key)
     return _client
@@ -48,7 +59,13 @@ def parse_score(text: str) -> Optional[int]:
     match = re.search(r"\d+(?:\.\d+)?", text or "")
     if not match:
         return None
-    return int(float(match.group()))
+    value = int(float(match.group()))
+    # Every score in this program lives on a 0 to 100 scale. A number
+    # outside it is a reply I cannot use, not a passing grade, so it
+    # reads the same as no number at all and the callers fail closed.
+    if value < 0 or value > 100:
+        return None
+    return value
 
 class Question:
     def __init__(self, text: str):
@@ -74,7 +91,11 @@ class Question:
         return input("Your answer: ").strip()
 
 def get_user_task():
-    initial_task = input("Please enter the task you want to achieve: ")
+    # A blank task would be scored and questioned against nothing, so
+    # it is asked for again instead of sent to the model.
+    initial_task = input("Please enter the task you want to achieve: ").strip()
+    while not initial_task:
+        initial_task = input("The task cannot be blank. Please enter the task you want to achieve: ").strip()
     return ask_additional_questions(initial_task)
 
 def get_specific_questions(task_details: str) -> List[Question]:
@@ -277,13 +298,17 @@ def get_website_info(website):
 
     # Regular website analysis for unknown sites
     try:
+        import requests
+        from bs4 import BeautifulSoup
+
         http_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        # I never check the status code here. A 404 or a block page is
-        # parsed and scored like real content, which can produce a
-        # confident verdict about a page the user never sees. The 10
-        # second timeout is the only guard, and a slow site falls into
-        # the exception path below and is reported as a fetch failure.
+        # The status code is checked now. Before this fix a 404 or a
+        # block page was parsed and scored like real content, which
+        # could produce a confident verdict about a page the user never
+        # sees. raise_for_status sends those into the exception path
+        # below, where they are reported as a fetch failure instead.
         response = requests.get(ensure_scheme(website), headers=http_headers, timeout=10)
+        response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Get all text content
@@ -534,6 +559,10 @@ def main():
         except (EOFError, KeyboardInterrupt):
             print("\nExiting.")
             break
+        website = website.strip()
+        if not website:
+            print("Enter a website URL, or 'exit' to quit.")
+            continue
         if website.lower() in ['exit', 'quit']:
             break
         print("\n" + "-" * 80)
@@ -545,5 +574,18 @@ def main():
             print(f"\n❌ {website} is not productive for your task.")
         print("\n" + "=" * 80)
 
+USAGE = (
+    "Usage: python3 tool.py [--help]\n"
+    "Judge websites against a task you describe, using the Gemini API.\n"
+    "Takes no arguments. Set GEMINI_API_KEY (or GOOGLE_API_KEY) first."
+)
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 2 and sys.argv[1] in ("--help", "-h"):
+        print(USAGE)
+    elif len(sys.argv) > 1:
+        print(f"Error: unknown argument: {sys.argv[1]}", file=sys.stderr)
+        print(USAGE, file=sys.stderr)
+        sys.exit(2)
+    else:
+        main()
