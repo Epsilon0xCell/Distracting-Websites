@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distracting Websites: what it is, how it runs, where it stops</title>
+<meta name="description" content="A single-file Python tool, tool.py, that judges whether a website is productive for a task you describe. It asks what you want to achieve, uses the Ge">
+<style>
+:root {
+  --bg: #181c3a; --panel: #22284e; --ink: #eeeef6;
+  --mut: #2d3669;
+  --acc: #7eb8f7; --acc2: #f7ba7e;
+  --line: #22284e;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font-family: Charter, Georgia, serif; line-height: 1.55; }
+code, pre, .mono { font-family: 'DejaVu Sans Mono', monospace; }
+a { color: var(--acc2); }
+.hero { padding: 3rem 6vw 1rem; }
+.hero img.banner { width: 100%; height: auto; border: 1px solid var(--line);
+  border-radius: 10px; }
+.logo { width: 92px; height: 92px; border-radius: 18px;
+  border: 1px solid var(--line); }
+h1 { font-size: 2.4rem; margin: 0.4em 0 0.1em; }
+h2 { border-bottom: 2px solid var(--acc); padding-bottom: 0.2em;
+  margin-top: 2em; }
+.lede { font-size: 1.15rem; max-width: 62ch; }
+main { padding: 0 6vw 3rem; max-width: 1180px; margin: 0 auto; }
+.grid { display: grid; gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; padding: 1rem 1.2rem; }
+.card.pop { animation: rise 0.7s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; } }
+pre.code { background: #101014; color: #e8e6df; padding: 1rem 1.2rem;
+  border-radius: 12px; overflow-x: auto; font-size: 0.86rem;
+  border-left: 5px solid var(--acc); }
+table { border-collapse: collapse; width: 100%; }
+td, th { border-bottom: 1px solid var(--line); padding: 0.45rem 0.6rem;
+  text-align: left; }
+.shots { display: grid; gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.shots img { width: 100%; height: auto; border: 1px solid var(--line);
+  border-radius: 10px; background: #f4f1e8; }
+footer { padding: 2rem 6vw; border-top: 1px solid var(--line);
+  color: var(--mut); }
+.rail { display: flex; gap: 1.2rem; align-items: flex-start; }
+.rail nav { position: sticky; top: 1rem; min-width: 180px; }
+@media (max-width: 760px) { .rail { flex-direction: column; }
+  .rail nav { position: static; } }
+@media (prefers-reduced-motion: reduce) {
+  .card.pop { animation: none; } * { scroll-behavior: auto; } }
+</style>
+</head>
+<body class="layout-ledger">
+<!-- This page exists for Distracting-Websites alone: the layout (ledger),
+     the colors, and the type were picked for this project, not
+     shared with the other project pages. The code block below is
+     copied from the file it names, line for line. If it looks
+     plain, that is because the project is plain, and I would
+     rather the page match the project than dress it up. The one
+     thing I will not do here is oversell: what this project does
+     not do is stated on the page, not hidden from it. -->
+<header class="hero">
+  <img class="logo" src="assets/logo.png" alt="Distracting Websites logo">
+  <img class="banner" src="assets/banner.png" alt="">
+  <h1>Distracting Websites</h1>
+  <p class="mono"><a href="https://github.com/Epsilon0xCell/Distracting-Websites">github.com/Epsilon0xCell/Distracting-Websites</a></p>
+</header>
+
+<main>
+  <section class="rail">
+    <nav aria-label="on this page">
+      <p class="mono"><a href="#run">Run it</a><br>
+      <a href="#files">The files</a><br>
+      <a href="#sheets">The sheets</a><br>
+      <a href="https://github.com/Epsilon0xCell/Distracting-Websites">The repo</a></p>
+    </nav>
+    <div>
+      <p class="lede">A single-file Python tool, tool.py, that judges whether a website is productive for a task you describe. It asks what you want to achieve, uses the Gemini API to ask follow-up questions until the task is specific enough, then scores each website you enter against that task and prints a productive or</p>
+      <div class="grid">
+        <div class="card pop"><h3>What it is</h3>
+          <p>Distracting Websites: 6 files, 617 counted
+          lines across Python 549, Markdown 65, Text 3. One job, done in the
+          open, in files you can read.</p></div>
+        <div class="card pop"><h3>The biggest piece</h3>
+          <p><code>tool.py</code> carries the most
+          lines. If the project grows, that file is where the growth
+          lands first, for better or worse.</p></div>
+        <div class="card pop"><h3>The honest gap</h3>
+          <p>No test files yet. That is the honest gap, and the roadmap in the visuals folder says what the first one should cover.</p></div>
+      </div>
+      <section id="run">
+        <h2>Run it</h2>
+        <p>The repo README has the exact commands for this one. The
+        shape is the shape for most of my projects: clone it, read the
+        top file first so you know what will happen, then run it on
+        something you do not mind breaking.</p>
+        <p class="mono">$ git clone https://github.com/Epsilon0xCell/Distracting-Websites.git<br>$ cd Distracting-Websites</p>
+      </section>
+      
+  <section aria-label="real code">
+    <h2>The code, as it sits in the repo</h2>
+    <p>From <code>tool.py</code>, line 17 on. I did
+    not tidy it for the page. What you see is what the file has.</p>
+    <pre class="code"><code>_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        api_key = os.environ.get(&quot;GEMINI_API_KEY&quot;) or os.environ.get(&quot;GOOGLE_API_KEY&quot;)
+        if not api_key:
+            raise RuntimeError(
+                &quot;No Gemini API key found. Set the GEMINI_API_KEY environment &quot;
+                &quot;variable to a key from Google AI Studio and run again.&quot;
+            )
+        _client = genai.Client(api_key=api_key)
+    return _client
+
+def normalize_domain(website: str) -&gt; str:
+    # urlparse only fills netloc when a scheme is present, and callers type
+    # addresses in forms like &quot;khanacademy.org&quot; or &quot;www.khanacademy.org&quot;.
+    candidate = website if &quot;://&quot; in website else &quot;https://&quot; + website
+    domain = urlparse(candidate).netloc.lower().split(&quot;:&quot;)[0]
+    if domain.startswith(&quot;www.&quot;):
+        domain = domain[4:]
+    return domain</code></pre>
+  </section>
+      <section id="files">
+        <h2>The files that matter</h2>
+        <table><tr><th>File</th><th>Lines</th></tr>
+        <tr><td><code>tool.py</code></td><td>549</td></tr>
+        <tr><td><code>README.md</code></td><td>65</td></tr>
+        <tr><td><code>requirements.txt</code></td><td>3</td></tr>
+        <tr><td><code>assets/banner.png</code></td><td>0</td></tr>
+        <tr><td><code>assets/logo.png</code></td><td>0</td></tr>
+        <tr><td><code>__pycache__/tool.cpython-312.pyc</code></td><td>0</td></tr>
+        </table>
+        <p>Names doing the work: <span class="mono">get_client, normalize_domain, ensure_scheme, parse_score, Question, get_user_task, get_specific_questions, is_task_specific_enough</span>.</p>
+      </section>
+      <section id="sheets">
+        <h2>Drawn by hand</h2>
+        <p>I sketch my projects on notebook paper so I have to
+        understand them well enough to draw them. The full set,
+        with the counts and how they were counted, is the
+        <a href="https://github.com/Epsilon0xCell/Distracting-Websites/tree/main/Distracting-Websites-Visuals">Distracting-Websites-Visuals</a>
+        folder in the repo. Nothing is drawn over the binder holes.
+        That is a rule, not a style.</p>
+        <div class="shots">
+          <img src="assets/architecture.png" alt="Hand drawn architecture sheet for Distracting Websites">
+          <img src="assets/flowchart.png" alt="Hand drawn flowchart sheet for Distracting Websites">
+          <img src="assets/product-map.png" alt="Hand drawn product map sheet for Distracting Websites">
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+<footer>
+  <p>Distracting Websites is one of my projects. This page was written
+  from the repo itself on 2026-10-30: the counts are the
+  repo's counts, the code is the repo's code, and the gaps are the
+  repo's gaps.</p>
+</footer>
+</body>
+</html>
