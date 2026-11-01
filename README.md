@@ -1,6 +1,17 @@
-![banner](assets/banner.png)
+![Distracting Websites introduction, wordless](intro-banner.png)
+
+
+# Distracting Websites
+![Distracting Websites banner](banner.png)
+
+![Distracting Websites animated scene](assets-scene.svg)
 
 # Distracting Websites: Website Productivity Analyzer
+
+
+> FETCH FAILED, SCORED AS NOT PRODUCTIVE
+
+
 
 A single-file Python tool, `tool.py`, that judges whether a website is
 productive for a task you describe. It asks what you want to achieve,
@@ -8,6 +19,11 @@ uses the Gemini API to ask follow-up questions until the task is
 specific enough, then scores each website you enter against that task
 and prints a productive or not productive verdict. It only advises: it
 does not block anything.
+
+
+<p align="center"><img src="sep-heavy.svg" alt=""></p>
+
+<p class="plate"><sub>DEPTH MARK 1 · SOUNDING LINE · gauge ○</sub></p>
 
 ## How it works
 
@@ -32,6 +48,11 @@ does not block anything.
    facebook.com, and tiktok.com have their score scaled down (by 0.8
    to 0.9 depending on the domain) before the threshold is applied.
 
+
+<p align="center"><img src="sep-heavy.svg" alt=""></p>
+
+<p class="plate"><sub>DEPTH MARK 2 · SOUNDING LINE · gauge ○</sub></p>
+
 ## Requirements
 
 - Python 3
@@ -39,6 +60,11 @@ does not block anything.
   and `google-genai`
 - A Gemini API key from Google AI Studio
 - Network access, for the Gemini API and for fetching websites
+
+
+<p align="center"><img src="sep-heavy.svg" alt=""></p>
+
+<p class="plate"><sub>DEPTH MARK 3 · SOUNDING LINE · gauge ○</sub></p>
 
 ## Setup and run
 
@@ -58,6 +84,11 @@ usage text and exits 0, and it works before the packages above are
 installed, because the imports for them happen inside the functions
 that use them. Any other argument exits 2.
 
+
+<p align="center"><img src="sep-heavy.svg" alt=""></p>
+
+<p class="plate"><sub>DEPTH MARK 4 · SOUNDING LINE · gauge ○</sub></p>
+
 ## What it does not do
 
 - It does not block websites or apps, and there is no browser
@@ -72,6 +103,11 @@ that use them. Any other argument exits 2.
   the same way: the error page itself is not scored as content.
 - A model reply with a score outside 0 to 100 is treated as no score
   at all, and the check it fed fails closed.
+
+
+<p align="center"><img src="sep-heavy.svg" alt=""></p>
+
+<p class="plate"><sub>DEPTH MARK 5 · SOUNDING LINE · gauge ○</sub></p>
 
 ## Tests
 

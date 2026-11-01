@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" role="img" aria-label="Sponge dive scene">
+<defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b9096"/><stop offset="1" stop-color="#0a3456"/></linearGradient></defs>
+<rect width="1200" height="260" fill="url(#sea)"/>
+<g stroke="#c9c9c2" stroke-width="4" fill="none"><ellipse cx="600" cy="20" rx="10" ry="14"/><ellipse cx="612" cy="52" rx="10" ry="14"/><ellipse cx="600" cy="84" rx="10" ry="14"/><ellipse cx="612" cy="116" rx="10" ry="14"/><animateTransform attributeName="transform" type="rotate" values="-2 606 70;2 606 70;-2 606 70" dur="7s" repeatCount="indefinite"/></g>
+<circle cx="1080" cy="70" r="6" fill="#ffe28a"><animate attributeName="opacity" values=".25;1;.25" dur="5s" repeatCount="indefinite"/></circle>
+<circle cx="1140" cy="120" r="5" fill="#ffe28a"><animate attributeName="opacity" values="1;.25;1" dur="6s" repeatCount="indefinite"/></circle>
+<path d="M980 210 q60 -40 40 -100" fill="none" stroke="#96608c" stroke-width="10"><animateTransform attributeName="transform" type="rotate" values="0 990 205;6 990 205;0 990 205" dur="8s" repeatCount="indefinite"/></path>
+<g><animateTransform attributeName="transform" type="translate" values="0 0;560 0;0 0" dur="26s" repeatCount="indefinite"/>
+<circle cx="120" cy="128" r="34" fill="#b27638" stroke="#d2ac54" stroke-width="5"/><circle cx="108" cy="118" r="9" fill="#20909a"/><circle cx="134" cy="118" r="9" fill="#20909a"/><circle cx="121" cy="140" r="8" fill="#20909a"/>
+<rect x="96" y="160" width="48" height="52" fill="#d8c498"/><circle cx="162" cy="104" r="4" fill="#eef6f8"><animate attributeName="cy" values="104;60;104" dur="4s" repeatCount="indefinite"/></circle><circle cx="170" cy="88" r="3" fill="#eef6f8"><animate attributeName="cy" values="88;40;88" dur="5s" repeatCount="indefinite"/></circle></g>
+<g stroke="#e8808c" stroke-width="7" fill="none"><path d="M240 238 q-8 -44 -22 -62 M240 238 q0 -48 4 -70 M240 238 q10 -44 26 -60"><animate attributeName="opacity" values="1;.55;1" dur="5s" repeatCount="indefinite"/></path><path d="M840 238 q-8 -44 -22 -62 M840 238 q0 -48 4 -70 M840 238 q10 -44 26 -60"><animate attributeName="opacity" values=".55;1;.55" dur="6s" repeatCount="indefinite"/></path></g>
+<g stroke="#d8c498" stroke-width="5"><line x1="60" y1="238" x2="60" y2="206"><animate attributeName="y2" values="206;222;206" dur="4s" repeatCount="indefinite"/></line></g>
+<g fill="#e8b0a4"><circle cx="60" cy="200" r="4"/><circle cx="48" cy="192" r="3"/><circle cx="72" cy="192" r="3"/></g>
+</svg>
