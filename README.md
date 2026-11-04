@@ -1,12 +1,22 @@
-![Distracting Websites introduction, wordless](intro-banner.png)
+<p align="center"><img src="banner.png" width="800" alt="Distracting Websites banner"></p>
 
+<p align="center"><img src="logo.png" width="200" alt="Distracting Websites logo"></p>
 
-# Distracting Websites
-![Distracting Websites banner](banner.png)
+<img src="assets-scene.svg" alt="The Holographic Scale: a browser window weighed against a glowing target" width="100%">
 
-![Distracting Websites animated scene](assets-scene.svg)
+*The Holographic Scale: a browser window in violet and teal glass on one pan, a glowing target on the other, and every website weighed against the goal you named.*
+
+![Separator](sep-light.svg)
 
 # Distracting Websites: Website Productivity Analyzer
+
+## Contents
+
+- [How it works](#how-it-works)
+- [Requirements](#requirements)
+- [Setup and run](#setup-and-run)
+- [What it does not do](#what-it-does-not-do)
+- [Tests](#tests)
 
 
 > FETCH FAILED, SCORED AS NOT PRODUCTIVE
@@ -23,7 +33,7 @@ does not block anything.
 
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
-<p class="plate"><sub>DEPTH MARK 1 · SOUNDING LINE · gauge ○</sub></p>
+<p class="plate"><sub>PAN 1 · THE HOLOGRAPHIC SCALE · weighed ○</sub></p>
 
 ## How it works
 
@@ -51,7 +61,7 @@ does not block anything.
 
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
-<p class="plate"><sub>DEPTH MARK 2 · SOUNDING LINE · gauge ○</sub></p>
+<p class="plate"><sub>PAN 2 · THE HOLOGRAPHIC SCALE · weighed ○</sub></p>
 
 ## Requirements
 
@@ -64,7 +74,7 @@ does not block anything.
 
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
-<p class="plate"><sub>DEPTH MARK 3 · SOUNDING LINE · gauge ○</sub></p>
+<p class="plate"><sub>PAN 3 · THE HOLOGRAPHIC SCALE · weighed ○</sub></p>
 
 ## Setup and run
 
@@ -87,7 +97,7 @@ that use them. Any other argument exits 2.
 
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
-<p class="plate"><sub>DEPTH MARK 4 · SOUNDING LINE · gauge ○</sub></p>
+<p class="plate"><sub>PAN 4 · THE HOLOGRAPHIC SCALE · weighed ○</sub></p>
 
 ## What it does not do
 
@@ -105,9 +115,11 @@ that use them. Any other argument exits 2.
   at all, and the check it fed fails closed.
 
 
+<p align="center"><img src="intro-banner.png" width="800" alt="Distracting Websites introduction, wordless"></p>
+
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
-<p class="plate"><sub>DEPTH MARK 5 · SOUNDING LINE · gauge ○</sub></p>
+<p class="plate"><sub>PAN 5 · THE HOLOGRAPHIC SCALE · weighed ○</sub></p>
 
 ## Tests
 

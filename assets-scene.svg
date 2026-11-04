@@ -1,14 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" role="img" aria-label="Sponge dive scene">
-<defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b9096"/><stop offset="1" stop-color="#0a3456"/></linearGradient></defs>
-<rect width="1200" height="260" fill="url(#sea)"/>
-<g stroke="#c9c9c2" stroke-width="4" fill="none"><ellipse cx="600" cy="20" rx="10" ry="14"/><ellipse cx="612" cy="52" rx="10" ry="14"/><ellipse cx="600" cy="84" rx="10" ry="14"/><ellipse cx="612" cy="116" rx="10" ry="14"/><animateTransform attributeName="transform" type="rotate" values="-2 606 70;2 606 70;-2 606 70" dur="7s" repeatCount="indefinite"/></g>
-<circle cx="1080" cy="70" r="6" fill="#ffe28a"><animate attributeName="opacity" values=".25;1;.25" dur="5s" repeatCount="indefinite"/></circle>
-<circle cx="1140" cy="120" r="5" fill="#ffe28a"><animate attributeName="opacity" values="1;.25;1" dur="6s" repeatCount="indefinite"/></circle>
-<path d="M980 210 q60 -40 40 -100" fill="none" stroke="#96608c" stroke-width="10"><animateTransform attributeName="transform" type="rotate" values="0 990 205;6 990 205;0 990 205" dur="8s" repeatCount="indefinite"/></path>
-<g><animateTransform attributeName="transform" type="translate" values="0 0;560 0;0 0" dur="26s" repeatCount="indefinite"/>
-<circle cx="120" cy="128" r="34" fill="#b27638" stroke="#d2ac54" stroke-width="5"/><circle cx="108" cy="118" r="9" fill="#20909a"/><circle cx="134" cy="118" r="9" fill="#20909a"/><circle cx="121" cy="140" r="8" fill="#20909a"/>
-<rect x="96" y="160" width="48" height="52" fill="#d8c498"/><circle cx="162" cy="104" r="4" fill="#eef6f8"><animate attributeName="cy" values="104;60;104" dur="4s" repeatCount="indefinite"/></circle><circle cx="170" cy="88" r="3" fill="#eef6f8"><animate attributeName="cy" values="88;40;88" dur="5s" repeatCount="indefinite"/></circle></g>
-<g stroke="#e8808c" stroke-width="7" fill="none"><path d="M240 238 q-8 -44 -22 -62 M240 238 q0 -48 4 -70 M240 238 q10 -44 26 -60"><animate attributeName="opacity" values="1;.55;1" dur="5s" repeatCount="indefinite"/></path><path d="M840 238 q-8 -44 -22 -62 M840 238 q0 -48 4 -70 M840 238 q10 -44 26 -60"><animate attributeName="opacity" values=".55;1;.55" dur="6s" repeatCount="indefinite"/></path></g>
-<g stroke="#d8c498" stroke-width="5"><line x1="60" y1="238" x2="60" y2="206"><animate attributeName="y2" values="206;222;206" dur="4s" repeatCount="indefinite"/></line></g>
-<g fill="#e8b0a4"><circle cx="60" cy="200" r="4"/><circle cx="48" cy="192" r="3"/><circle cx="72" cy="192" r="3"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="190" viewBox="0 0 800 190" role="img" aria-label="The Holographic Scale: a browser window weighed against a glowing target, orbs of light rising like questions">
+<rect width="800" height="190" fill="#1c1826"/>
+<circle cx="120" cy="150" r="3" fill="#2dd4bf"><animate attributeName="cy" values="150;40" dur="5s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;0" dur="5s" repeatCount="indefinite"/></circle>
+<circle cx="680" cy="160" r="2.5" fill="#8b5cf6"><animate attributeName="cy" values="160;50" dur="6s" begin="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;0" dur="6s" begin="1s" repeatCount="indefinite"/></circle>
+<circle cx="240" cy="165" r="2" fill="#c4b5fd"><animate attributeName="cy" values="165;60" dur="4.2s" begin="0.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0.9;0" dur="4.2s" begin="0.6s" repeatCount="indefinite"/></circle>
+<g><animateTransform attributeName="transform" type="rotate" values="-3 400 42;3 400 42;-3 400 42" dur="4.6s" repeatCount="indefinite"/>
+<line x1="190" y1="42" x2="610" y2="42" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round"/>
+<line x1="250" y1="42" x2="215" y2="92" stroke="#2dd4bf" stroke-width="2.5"/><line x1="250" y1="42" x2="285" y2="92" stroke="#2dd4bf" stroke-width="2.5"/>
+<path d="M200 92 h100 a50 14 0 0 1 -100 0 Z" fill="#2dd4bf" opacity="0.35" stroke="#2dd4bf" stroke-width="2"/>
+<rect x="222" y="58" width="56" height="34" rx="4" fill="none" stroke="#c4b5fd" stroke-width="3"/><line x1="222" y1="68" x2="278" y2="68" stroke="#c4b5fd" stroke-width="2"/><circle cx="229" cy="63" r="2.2" fill="#2dd4bf"/><circle cx="237" cy="63" r="2.2" fill="#8b5cf6"/>
+<line x1="550" y1="42" x2="515" y2="92" stroke="#2dd4bf" stroke-width="2.5"/><line x1="550" y1="42" x2="585" y2="92" stroke="#2dd4bf" stroke-width="2.5"/>
+<path d="M500 92 h100 a50 14 0 0 1 -100 0 Z" fill="#8b5cf6" opacity="0.35" stroke="#8b5cf6" stroke-width="2"/>
+<circle cx="550" cy="76" r="17" fill="none" stroke="#2dd4bf" stroke-width="3"/><circle cx="550" cy="76" r="10" fill="none" stroke="#8b5cf6" stroke-width="3"/><circle cx="550" cy="76" r="4" fill="#c4b5fd"><animate attributeName="r" values="3.4;4.8;3.4" dur="2.2s" repeatCount="indefinite"/></circle>
+</g>
+<line x1="400" y1="30" x2="400" y2="150" stroke="#c4b5fd" stroke-width="5" stroke-linecap="round"/><circle cx="400" cy="26" r="7" fill="#2dd4bf"/>
+<path d="M362 158 h76 l10 16 h-96 Z" fill="#8b5cf6" opacity="0.8"/>
+<line x1="60" y1="174" x2="740" y2="174" stroke="#2dd4bf" stroke-width="1.5" opacity="0.5"/>
 </svg>
