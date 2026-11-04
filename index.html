@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Distracting Websites: a sounding line paid out from the boat</title>
+<title>Distracting Websites: weighed on the holographic scale</title>
 <meta name="description" content="A single file Python tool which questions you until your task is specific, then scores each website against that task.">
 <style>@font-face{font-family:'Coral Pixels';src:url('assets/fonts/CoralPixels-Regular.ttf') format('truetype');font-display:swap}
 @font-face{font-family:'Bitter';src:url('assets/fonts/Bitter.ttf') format('truetype');font-display:swap}
-*{box-sizing:border-box} body{margin:0;color:#f0e6cc;font-family:'Bitter',serif;line-height:1.65;background:linear-gradient(180deg,#7fc6cc 0%,#2b9096 22%,#14586e 55%,#0a3456 100%)}
+*{box-sizing:border-box} body{margin:0;color:#ede9fe;font-family:'Bitter',serif;line-height:1.65;background:linear-gradient(180deg,#2a2438 0%,#241f33 22%,#1c1826 55%,#14101d 100%)}
 h1,h2{font-family:'Coral Pixels',serif;font-weight:400} h1{font-size:2.4rem} h2{font-size:1.5rem}
 .linewrap{display:flex;max-width:1180px;margin:0 auto;padding:0 4vw 3rem}
-.sounding{flex:0 0 74px;border-right:3px solid #d8c498;position:relative;margin-right:2rem}
-.sounding span{display:block;color:#d8c498;font-size:.78rem;margin:0 0 7.2rem .4rem}
-main{flex:1;min-width:0;padding-top:1.4rem} .hero img.banner{width:100%;height:auto;border:3px solid #b08d3e}
-.logo{width:84px;height:84px;border:3px solid #b08d3e}
-.tag{background:rgba(216,196,152,.94);color:#20303a;border:2px solid #b08d3e;padding:1rem 1.3rem;margin:1.1rem 0}
-.tag h2{color:#20303a;margin-top:.1em}
-.btn{display:inline-block;background:rgba(20,70,86,.85);color:#cfeef0;padding:.55rem 1.2rem;margin:.2rem .3rem .2rem 0;border:2px solid #b08d3e;border-radius:46% 54% 52% 48%/58% 60% 40% 42%;box-shadow:inset 0 0 0 1px #e8808c;text-decoration:none;transition:background .3s} .btn:hover{background:rgba(46,120,132,.95)} .btn:active{transform:translateY(2px);background:#0a3456}
-a{color:#ffe9a8} .tag a{color:#7a3b12} a::before{content:"\25C7  "} a:hover::before{color:#d8c498}
-code,pre{font-family:ui-monospace,Menlo,monospace} pre.code{background:#0d2233;color:#e8e6df;padding:1rem;overflow-x:auto;font-size:.84rem;border-left:6px solid #b08d3e}
-table{border-collapse:collapse;width:100%} td,th{border-bottom:1px solid #8a6f42;padding:.4rem .6rem;text-align:left}
-.gauge{display:inline-block;border:4px solid #b08d3e;border-radius:50%;width:86px;height:86px;text-align:center;line-height:78px;background:#e8e0c8;color:#20303a;font-weight:700}
-.shots{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))} .shots img{width:100%;height:auto;background:#f4f1e8}
+.sounding{flex:0 0 74px;border-right:3px solid #c4b5fd;position:relative;margin-right:2rem}
+.sounding span{display:block;color:#c4b5fd;font-size:.78rem;margin:0 0 7.2rem .4rem}
+main{flex:1;min-width:0;padding-top:1.4rem} .hero img.banner{width:100%;height:auto;border:3px solid #8b5cf6}
+.logo{width:84px;height:84px;border:3px solid #8b5cf6}
+.tag{background:rgba(52,44,74,.96);color:#ede9fe;border:2px solid #8b5cf6;padding:1rem 1.3rem;margin:1.1rem 0}
+.tag h2{color:#c4b5fd;margin-top:.1em}
+.btn{display:inline-block;background:rgba(139,92,246,.28);color:#ccfbf1;padding:.55rem 1.2rem;margin:.2rem .3rem .2rem 0;border:2px solid #8b5cf6;border-radius:46% 54% 52% 48%/58% 60% 40% 42%;box-shadow:inset 0 0 0 1px #2dd4bf;text-decoration:none;transition:background .3s} .btn:hover{background:rgba(45,212,191,.35)} .btn:active{transform:translateY(2px);background:#171225}
+a{color:#5eead4} .tag a{color:#a78bfa} a::before{content:"\25C7  "} a:hover::before{color:#c4b5fd}
+code,pre{font-family:ui-monospace,Menlo,monospace} pre.code{background:#120e1c;color:#ede9fe;padding:1rem;overflow-x:auto;font-size:.84rem;border-left:6px solid #8b5cf6}
+table{border-collapse:collapse;width:100%} td,th{border-bottom:1px solid #6d5aa8;padding:.4rem .6rem;text-align:left}
+.gauge{display:inline-block;border:4px solid #8b5cf6;border-radius:50%;width:86px;height:86px;text-align:center;line-height:78px;background:#2a2438;color:#ede9fe;font-weight:700}
+.shots{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))} .shots img{width:100%;height:auto;background:#241f33}
 footer{max-width:1180px;margin:0 auto;padding:1.4rem 4vw 2.6rem}
 @media(max-width:700px){.sounding{display:none}}
 </style></head><body>
 <div class="linewrap"><aside class="sounding" aria-label="Sounding line"><span>0 fm</span><span>5 fm</span><span>10 fm</span><span>15 fm</span><span>20 fm</span><span>25 fm</span></aside>
 <main>
-<div class="hero"><img class="banner" src="assets/banner.png" alt="Kalymnos sponge boat banner"><div style="display:flex;gap:1rem;align-items:center;margin-top:1rem"><img class="logo" src="assets/logo.png" alt="Distracting Websites logo"><h1>Distracting Websites</h1></div>
+<div class="hero"><img class="banner" src="assets/banner.png" alt="Browser windows weighed on a balance scale before a glowing target"><div style="display:flex;gap:1rem;align-items:center;margin-top:1rem"><img class="logo" src="assets/logo.png" alt="Distracting Websites logo"><h1>Distracting Websites</h1></div>
 <p><a href="https://github.com/Epsilon0xCell/Distracting-Websites">github.com/Epsilon0xCell/Distracting-Websites</a></p>
 <p>A single file Python tool, <code>tool.py</code>, which questions you until your task is specific, then scores each website you enter against that task and prints productive or not productive. It advises. It blocks nothing.</p>
 <nav><a class="btn" href="#run">Run it</a><a class="btn" href="#files">The files</a><a class="btn" href="#sheets">The sheets</a><a class="btn" href="https://github.com/Epsilon0xCell/Distracting-Websites">The repo</a></nav></div>
