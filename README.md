@@ -10,13 +10,38 @@
 
 # Distracting Websites: Website Productivity Analyzer
 
+*A single-file Python tool, `tool.py`, that judges whether a website is productive for a task you describe.*
+
+[![Python 3](https://img.shields.io/badge/Python-3-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+## Quick Verdict
+
+The tool takes no command-line flags for the goal or the site: you run it, state your task at the prompt, then enter a website. Its prompts and verdict lines look like this, for a site on its built-in known-platform list:
+
+```text
+$ python3 tool.py
+Please enter the task you want to achieve: write my thesis
+Enter the website URL to analyze (or 'exit' to quit): classroom.google.com
+
+✅ classroom.google.com is productive for your task.
+```
+
+The verdict above follows the documented known-platform path: classroom.google.com is answered locally with a fixed base score of 90, with no fetch and no API call (see How it works). I also ran the tool in this workspace: `python3 tool.py --help` prints its usage text and exits 0, and with no Gemini key set it prints a short message naming the missing variable and exits instead of crashing.
+
+---
+
 ## Contents
 
+- [Quick Verdict](#quick-verdict)
 - [How it works](#how-it-works)
 - [Requirements](#requirements)
 - [Setup and run](#setup-and-run)
+- [Examples](#examples)
 - [What it does not do](#what-it-does-not-do)
 - [Tests](#tests)
+
+---
 
 
 > FETCH FAILED, SCORED AS NOT PRODUCTIVE
@@ -37,27 +62,11 @@ does not block anything.
 
 ## How it works
 
-1. You enter the task you want to achieve.
-2. The tool scores the task description for specificity with Gemini
-   (subject, task type, context, and resource needs). Below the
-   threshold it generates follow-up questions and merges your answers
-   into the task description, up to 10 rounds.
-3. For each website URL you enter, the tool gathers information:
-   - A small built-in list of known educational platforms
-     (classroom.google.com and khanacademy.org) is answered locally
-     with a fixed low distraction profile, with no fetch and no API
-     call. Bare domains and `www.` addresses are recognized too.
-   - Any other site is fetched and summarized from its title, meta
-     description, headings, and opening paragraphs, plus simple
-     keyword counts for entertainment, social, and advertising
-     elements and a capped distraction ratio between 0 and 1.
-4. Gemini scores the site against your task from 0 to 100. The site is
-   productive at 75 or above. Known educational platforms use fixed
-   base scores instead (for example 90 for Google Classroom, 85 for
-   Khan Academy), and high-distraction domains such as youtube.com,
-   facebook.com, and tiktok.com have their score scaled down (by 0.8
-   to 0.9 depending on the domain) before the threshold is applied.
-
+1. **You state a goal.** You enter the task you want to achieve. The tool scores the task description for specificity with Gemini (subject, task type, context, and resource needs). Below the threshold it generates follow-up questions and merges your answers into the task description, up to 10 rounds.
+2. **You give it a website.** For each website URL you enter, the tool gathers information:
+   - A small built-in list of known educational platforms (classroom.google.com and khanacademy.org) is answered locally with a fixed low distraction profile, with no fetch and no API call. Bare domains and `www.` addresses are recognized too.
+   - Any other site is fetched and summarized from its title, meta description, headings, and opening paragraphs, plus simple keyword counts for entertainment, social, and advertising elements and a capped distraction ratio between 0 and 1.
+3. **It returns a verdict.** Gemini scores the site against your task from 0 to 100. The site is productive at 75 or above. Known educational platforms use fixed base scores instead (for example 90 for Google Classroom, 85 for Khan Academy), and high-distraction domains such as youtube.com, facebook.com, and tiktok.com have their score scaled down (by 0.8 to 0.9 depending on the domain) before the threshold is applied.
 
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
@@ -95,6 +104,17 @@ installed, because the imports for them happen inside the functions
 that use them. Any other argument exits 2.
 
 
+## Examples
+
+These are the example sites whose scores are documented in this README and in `tool.py`. Sites that are not on the known-platform list are scored by Gemini against your task from 0 to 100, so no fixed score is published for them here.
+
+| Website | Goal | Verdict | Score |
+| --- | --- | --- | --- |
+| classroom.google.com | Any task (known educational platform, answered locally) | Productive | 90 (fixed base score) |
+| khanacademy.org | Any task (known educational platform, answered locally) | Productive | 85 (fixed base score) |
+
+---
+
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
 <p class="plate"><sub>PAN 4 · THE HOLOGRAPHIC SCALE · weighed ○</sub></p>
@@ -114,8 +134,6 @@ that use them. Any other argument exits 2.
 - A model reply with a score outside 0 to 100 is treated as no score
   at all, and the check it fed fails closed.
 
-
-<p align="center"><img src="intro-banner.png" width="800" alt="Distracting Websites introduction, wordless"></p>
 
 <p align="center"><img src="sep-heavy.svg" alt=""></p>
 
